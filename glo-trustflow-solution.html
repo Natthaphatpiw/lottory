@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLO TrustFlow AI — Solution Reference Document v1.0</title>
+  <meta name="description" content="แพลตฟอร์มจัดการเคสอัจฉริยะของสำนักงานสลากกินแบ่งรัฐบาล — Solution Architecture &amp; Reference Document">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <style>
+    /* ============ RESET &amp; BASE ============ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+    :root {
+      --bg: #FCFBF8;
+      --bg-section: #FFFFFF;
+      --bg-cream: #F5F2EA;
+      --bg-mauve: #FBF4F4;
+      --bg-blue: #F4F6FA;
+      --bg-dark: #0B1929;
+      --bg-dark-2: #131F33;
+
+      --navy: #0B2545;
+      --navy-2: #13315C;
+      --slate: #335C81;
+      --gold: #B8860B;
+      --gold-light: #D4A24C;
+      --maroon: #7F1D1D;
+      --maroon-dark: #5C1818;
+
+      --text: #0B2545;
+      --text-2: #4B5563;
+      --text-3: #6B7280;
+      --text-tag: #8B7355;
+      --text-light: #9CA3AF;
+
+      --border: #E5E7EB;
+      --border-2: #D1D5DB;
+
+      --shadow-sm: 0 1px 2px rgba(11,37,69,.04);
+      --shadow-md: 0 2px 8px rgba(11,37,69,.06);
+      --shadow-lg: 0 8px 24px rgba(11,37,69,.08);
+
+      --font-thai: 'IBM Plex Sans Thai', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', Menlo, monospace;
+    }
+
+    body {
+      font-family: var(--font-thai);
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-2);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a { color: var(--navy); text-decoration: none; }
+    a:hover { color: var(--gold); }
+
+    /* ============ TYPOGRAPHY ============ */
+    h1, h2, h3, h4, h5, h6 { color: var(--text); font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.875rem; margin-bottom: 0.5rem; }
+    h3 { font-size: 1.375rem; margin-bottom: 0.5rem; }
+    h4 { font-size: 1.125rem; margin-bottom: 0.5rem; }
+    h5 { font-size: 0.95rem; font-weight: 600; }
+
+    p { margin-bottom: 1rem; }
+
+    .eyebrow {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .section-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--text-tag);
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      background: white;
+    }
+    .lede { font-size: 1.1rem; color: var(--text-2); line-height: 1.7; }
+
+    /* ============ TOP NAV ============ */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(252, 251, 248, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 36px; height: 36px;
+      background: var(--navy);
+      border: 2px solid var(--gold);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+    }
+    .brand-text { line-height: 1.15; }
+    .brand-title { color: var(--navy); font-weight: 700; font-size: 15px; }
+    .brand-sub { color: var(--text-3); font-size: 11px; letter-spacing: 0.05em; }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 28px;
+    }
+    .nav-links a {
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 500;
+      padding-bottom: 4px;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-links a:hover {
+      color: var(--navy);
+      border-bottom-color: var(--gold);
+    }
+    .nav-meta {
+      color: var(--text-tag);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    /* ============ TOP RIBBON ============ */
+    .top-ribbon {
+      background: var(--navy);
+      height: 6px;
+      border-bottom: 3px solid var(--gold);
+    }
+
+    /* ============ CONTAINERS ============ */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+    .container-wide { max-width: 1440px; margin: 0 auto; padding: 0 32px; }
+
+    section { padding: 80px 0; position: relative; }
+    section.tight { padding: 56px 0; }
+    section.dark { background: var(--bg-dark); color: #E2E8F0; }
+    section.dark h1, section.dark h2, section.dark h3, section.dark h4 { color: #F8FAFC; }
+    section.dark .eyebrow { color: var(--gold-light); }
+    section.alt { background: var(--bg-section); }
+    section.cream { background: var(--bg-cream); }
+
+    /* ============ HERO ============ */
+    .hero {
+      padding: 80px 0 64px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 48px;
+      align-items: start;
+    }
+    .hero-title {
+      font-size: 3.5rem;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      color: var(--navy);
+    }
+    .hero-tagline {
+      font-size: 1.25rem;
+      color: var(--text-2);
+      line-height: 1.55;
+      margin-bottom: 32px;
+      max-width: 720px;
+    }
+    .hero-pillars {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .pillar {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: white;
+      border: 1px solid var(--border-2);
+      padding: 7px 12px;
+      border-radius: 3px;
+    }
+    .pillar.primary { background: var(--navy); color: white; border-color: var(--navy); }
+    .pillar.accent { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+    .doc-control {
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--gold);
+      background: white;
+      padding: 24px;
+      font-size: 12px;
+    }
+    .doc-control-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--text-tag);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dc-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+    .dc-row:last-child { border-bottom: none; }
+    .dc-key { color: var(--text-3); }
+    .dc-val { color: var(--navy); font-weight: 600; }
+
+    /* ============ STAT STRIP ============ */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .stat {
+      background: white;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .stat-num .gold { color: var(--gold); }
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--text-tag);
+      text-transform: uppercase;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    .stat-cite {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    /* ============ SECTION HEADERS ============ */
+    .section-head { max-width: 880px; margin-bottom: 48px; }
+    .section-head h2 {
+      margin-bottom: 14px;
+      letter-spacing: -0.015em;
+    }
+    .section-head .lede { color: var(--text-2); }
+
+    /* ============ GRIDS &amp; CARDS ============ */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 28px 28px 26px;
+      position: relative;
+    }
+    .card-num {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--text-tag);
+    }
+    .card-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--navy);
+    }
+    .card-bar.gold { background: var(--gold); }
+    .card-bar.maroon { background: var(--maroon); }
+    .card-bar.slate { background: var(--slate); }
+
+    .card h4 { margin: 4px 0 12px; padding-right: 60px; }
+    .card p { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 0; }
+    .card .tag-row { margin-top: 16px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .card .tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      background: var(--bg-blue);
+      color: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ============ PAIN POINTS / PROBLEMS ============ */
+    .problem-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--maroon);
+      padding: 24px 28px;
+    }
+    .problem-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--maroon);
+      margin-bottom: 8px;
+    }
+    .problem-card h4 { color: var(--navy); margin-bottom: 10px; }
+    .problem-card p { font-size: 14px; color: var(--text-2); }
+
+    /* ============ FIGURE FRAME ============ */
+    .figure {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+    .figure-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .figure-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+    }
+    .figure-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-top: 4px;
+    }
+    .figure-ref {
+      font-size: 11px;
+      color: var(--text-tag);
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+    .figure-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .figure-caption {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-3);
+      font-style: italic;
+    }
+
+    /* ============ MERMAID (DARK) ============ */
+    .seq-block {
+      background: var(--bg-dark-2);
+      border: 1px solid #1E2D45;
+      border-radius: 4px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .seq-block .seq-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #1E2D45;
+    }
+    .seq-block .seq-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: var(--gold-light);
+    }
+    .seq-block .seq-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-top: 4px;
+    }
+    .seq-block .seq-ref {
+      font-size: 11px;
+      color: #94A3B8;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+    .seq-block .seq-desc {
+      font-size: 13px;
+      color: #94A3B8;
+      margin-bottom: 18px;
+      max-width: 900px;
+    }
+    .mermaid { background: transparent !important; text-align: center; }
+    .mermaid svg { max-width: 100%; height: auto; margin: 0 auto; }
+
+    /* ============ TRUST STACK CARDS ============ */
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .trust-card {
+      background: var(--bg-mauve);
+      border: 1px solid #FCA5A5;
+      border-left: 4px solid var(--maroon);
+      padding: 22px 24px;
+    }
+    .trust-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: var(--maroon);
+      margin-bottom: 8px;
+    }
+    .trust-card h4 { color: var(--navy); margin-bottom: 8px; font-size: 16px; }
+    .trust-card p { font-size: 13px; color: var(--text-2); margin-bottom: 8px; }
+    .trust-cite {
+      font-size: 11px;
+      color: var(--maroon);
+      font-style: italic;
+      padding-top: 8px;
+      border-top: 1px dashed #FCA5A5;
+    }
+
+    /* ============ TABLE ============ */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .data-table th {
+      background: var(--navy);
+      color: white;
+      text-align: left;
+      padding: 14px 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:nth-child(even) td { background: #FAFAF8; }
+    .data-table .code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--navy);
+      background: var(--bg-blue);
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .data-table .yes { color: #166534; font-weight: 700; }
+    .data-table .no { color: var(--text-3); }
+    .data-table .partial { color: var(--gold); font-weight: 600; }
+
+    /* ============ COMPARISON ============ */
+    .compare {
+      background: white;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .compare table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 800px;
+    }
+    .compare th {
+      padding: 14px 14px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .compare th:first-child { text-align: left; background: var(--navy); color: white; }
+    .compare th:not(:first-child) { background: #F5F2EA; color: var(--text); border-left: 1px solid var(--border); }
+    .compare th.us { background: var(--navy); color: white; border-left: 3px solid var(--gold); }
+    .compare td {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      text-align: center;
+      color: var(--text-2);
+    }
+    .compare td:first-child { text-align: left; font-weight: 500; color: var(--navy); background: #FAFAF8; }
+    .compare td.us { background: #F4F6FA; font-weight: 600; border-left: 3px solid var(--gold); }
+
+    /* ============ TIMELINE ============ */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--gold);
+    }
+    .phase {
+      position: relative;
+      padding: 12px 0 28px 24px;
+    }
+    .phase::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 18px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--gold);
+    }
+    .phase-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .phase h4 { margin-bottom: 6px; color: var(--navy); }
+    .phase p { font-size: 14px; color: var(--text-2); }
+
+    /* ============ CALLOUT ============ */
+    .callout {
+      background: var(--bg-cream);
+      border-left: 4px solid var(--gold);
+      padding: 20px 24px;
+      margin: 28px 0;
+      font-size: 14px;
+      color: var(--navy);
+      font-style: italic;
+    }
+    .callout strong { color: var(--navy); font-style: normal; font-weight: 700; }
+
+    /* ============ IMPACT CARDS ============ */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .impact-card {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 24px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+    .impact-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--navy), var(--gold));
+    }
+    .impact-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--text-tag);
+      text-transform: uppercase;
+    }
+    .impact-num {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 8px 0 4px;
+    }
+    .impact-desc { font-size: 13px; color: var(--text-2); margin-bottom: 12px; }
+    .impact-bench {
+      font-size: 11px;
+      color: var(--text-3);
+      font-style: italic;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ============ FOOTER ============ */
+    footer {
+      background: var(--navy);
+      color: #CBD5E0;
+      padding: 56px 0 32px;
+      margin-top: 80px;
+      border-top: 4px solid var(--gold);
+    }
+    footer .container { max-width: 1280px; }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 40px;
+    }
+    .footer-brand-title { color: white; font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .footer-brand-sub { color: #94A3B8; font-size: 14px; margin-bottom: 16px; }
+    .footer-meta { font-size: 12px; color: #94A3B8; }
+    footer h5 {
+      color: white;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    footer ul { list-style: none; font-size: 13px; }
+    footer ul li { padding: 4px 0; color: #94A3B8; }
+    footer .copy {
+      border-top: 1px solid #1E3A5F;
+      padding-top: 24px;
+      font-size: 12px;
+      color: #94A3B8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ============ PRINT ============ */
+    @media print {
+      .topnav, .nav-links { display: none; }
+      section { padding: 24px 0; page-break-inside: avoid; }
+      .figure, .seq-block, .card { page-break-inside: avoid; }
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .grid-3, .grid-4, .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-strip { grid-template-columns: repeat(3, 1fr); }
+      .trust-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    @media (max-width: 700px) {
+      .topnav-inner { flex-direction: column; align-items: flex-start; gap: 16px; padding: 16px 20px; }
+      .nav-links { gap: 18px; flex-wrap: wrap; font-size: 12px; }
+      .container, .container-wide { padding: 0 20px; }
+      .hero-title { font-size: 2.25rem; }
+      .grid-3, .grid-4, .impact-grid, .grid-2 { grid-template-columns: 1fr; }
+      .stat-strip { grid-template-columns: repeat(2, 1fr); }
+      section { padding: 56px 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ============ TOP RIBBON &amp; NAV ============ -->
+<div class="top-ribbon"></div>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand">
+      <div class="brand-mark">TF</div>
+      <div class="brand-text">
+        <div class="brand-title">GLO TrustFlow AI</div>
+        <div class="brand-sub">Solution Reference · v1.0</div>
+      </div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#flows">Sequence Flows</a></li>
+      <li><a href="#trust">Trust Stack</a></li>
+      <li><a href="#innovation">Innovation</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#plan">Plan</a></li>
+    </ul>
+    <div class="nav-meta">TRF-DOC-001</div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="overview">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">GLO Innovation Challenge 2026 · Solution Reference Document</div>
+        <h1 class="hero-title">GLO TrustFlow AI</h1>
+        <p class="hero-tagline">
+          แพลตฟอร์มจัดการเคสอัจฉริยะของสำนักงานสลากกินแบ่งรัฐบาล — เปลี่ยนเรื่องร้องเรียน คำขอ และเอกสารกระจัดกระจาย ให้กลายเป็นเคสที่ตรวจสอบได้ จัดการอัตโนมัติ และโปร่งใสตั้งแต่บรรทัดแรก
+        </p>
+        <div class="hero-pillars">
+          <span class="pillar primary">Pillar หลัก · Process Automation</span>
+          <span class="pillar">Smart Work Automation</span>
+          <span class="pillar">Sustainable Eco-Automation</span>
+          <span class="pillar accent">MVP: 2 Workflows · 3 Screens · Trust Stack</span>
+        </div>
+      </div>
+
+      <aside class="doc-control">
+        <div class="doc-control-title">Document Control</div>
+        <div class="dc-row"><span class="dc-key">Reference</span><span class="dc-val">TRF-DOC-001</span></div>
+        <div class="dc-row"><span class="dc-key">Revision</span><span class="dc-val">v1.0</span></div>
+        <div class="dc-row"><span class="dc-key">Issued</span><span class="dc-val">24 พฤษภาคม 2569</span></div>
+        <div class="dc-row"><span class="dc-key">Status</span><span class="dc-val">Draft for Review</span></div>
+        <div class="dc-row"><span class="dc-key">Classification</span><span class="dc-val" style="color:var(--maroon)">For Internal Review</span></div>
+        <div class="dc-row"><span class="dc-key">Owner</span><span class="dc-val">Solution Architect</span></div>
+        <div class="dc-row"><span class="dc-key">Page Count</span><span class="dc-val">Single Reference</span></div>
+      </aside>
+    </div>
+
+    <!-- Stat strip -->
+    <div class="stat-strip">
+      <div class="stat">
+        <div class="stat-num">10–12 <span class="gold">ล้าน</span></div>
+        <div class="stat-label">ประชาชนผู้ซื้อต่องวด</div>
+        <div class="stat-cite">GLO public statement</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">27 <span class="gold">ล้านใบ</span></div>
+        <div class="stat-label">สลากดิจิทัล Paotang</div>
+        <div class="stat-cite">2025 reported scale</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">≥ 88%</div>
+        <div class="stat-label">AI Accuracy Target</div>
+        <div class="stat-cite">เทียบ GOV.UK Chat</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">30–40%</div>
+        <div class="stat-label">ลดต้นทุน Processing</div>
+        <div class="stat-cite">IDP industry benchmark</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">~2,500 <span class="gold">kg</span></div>
+        <div class="stat-label">CO₂ ลดต่อปี (เริ่มต้น)</div>
+        <div class="stat-cite">100K cases × 5 pages/case</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXECUTIVE SUMMARY ============ -->
+<section class="alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 1 · Executive Summary</div>
+      <h2>สรุปแนวคิดโครงการ</h2>
+      <p class="lede">
+        GLO มีช่องทางดิจิทัลครอบคลุมแล้ว — my GLO, จองคิว, EMS, ระบบดีลเลอร์ — แต่กระบวนการ high-trust workflows ยังต้องเดินทาง กรอกซ้ำ และรอเจ้าหน้าที่ตรวจด้วยมือ TrustFlow คือชั้นบริการอัจฉริยะที่วางทับระบบเดิมโดยไม่รื้อ core system แปลงทุกเคสจากทุกช่องทางเป็น structured case ที่ตรวจสอบได้ จัดประเภทอัตโนมัติ และติดตามได้โปร่งใส
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-bar"></div>
+        <div class="card-num">01 · PROBLEM</div>
+        <h4>กระบวนการตรงกลางยังพึ่งแรงงาน</h4>
+        <p>ขณะที่ "ปลายทาง" เป็นดิจิทัลแล้ว กระบวนการที่เชื่อมประชาชน → เจ้าหน้าที่ → ผู้บริหาร ยังกระจัดกระจาย ตรวจสลากชำรุดต้องมายื่นที่นนทบุรีก่อน 14:00 น. อายัดสลากต้องก่อนวันออกรางวัล ร้องเรียนกระจายหลายช่องทาง</p>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">02 · SOLUTION</div>
+        <h4>ชั้นบริการ 5 Layer + Trust Stack</h4>
+        <p>Multimodal Intake · AI Triage &amp; Routing · Accessibility-First Lane · Process Mining Live Twin · Trust Stack ที่ครอบทุกชั้น — non-invasive overlay ที่ไม่กระทบ core system ของ GLO</p>
+      </div>
+      <div class="card">
+        <div class="card-bar maroon"></div>
+        <div class="card-num">03 · OUTCOME</div>
+        <h4>People · Process · Planet · Strategic</h4>
+        <p>ลดเวลาเดินทาง · ลดเคสวนกลับ · accessibility สำหรับผู้พิการ · ลดต้นทุน 30-40% · เพิ่มความเร็ว 50-70% · audit trail ครบทุก decision · เสริมจุดยืน WLA Level 2-4</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEM STATEMENT ============ -->
+<section id="problem">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 2 · Problem Statement</div>
+      <h2>หลักการและเหตุผล</h2>
+      <p class="lede">
+        GLO ดำเนินงานในสองมิติพร้อมกัน — เป็นทั้งหน่วยงานบริการสาธารณะที่ให้บริการประชาชนนับสิบล้านคนต่องวด และเป็น national lottery operator ที่ต้องปฏิบัติตามมาตรฐานสากล WLA-SCS และ WLA-RGF ระบบดิจิทัลที่ลงทุนไปแล้วยังไม่ถูกแปลงเป็นประสบการณ์ที่ดีของประชาชนเต็มที่
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="problem-card">
+        <div class="problem-num">PAIN POINT 01</div>
+        <h4>Fragmented Intake — ผู้ใช้ต้องเล่าเรื่องเดียวกันซ้ำหลายครั้ง</h4>
+        <p>ประชาชนต้องค้นหาช่องทางที่ถูกต้องด้วยตนเอง สลากชำรุดอีกช่องทาง การร้องเรียนราคาเกินอีกช่องทาง ปัญหาตัวแทนผู้พิการอีกช่องทาง เจ้าหน้าที่ต้อง "ต่อจิ๊กซอ" จากหลายแหล่ง และผู้ใช้รู้สึก "ถูกโยน" ระหว่างหน่วยงานย่อย</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">PAIN POINT 02</div>
+        <h4>Manual High-Trust Workflow — งานสำคัญยังต้องเดินทางและทำด้วยมือ</h4>
+        <p>การตรวจสอบสลากชำรุด การอายัดสลากหาย การขึ้นรางวัล ยังต้องเดินทางมายื่นที่สำนักงานนนทบุรีในเวลาราชการ ทำให้ผู้ที่อยู่ต่างจังหวัด ผู้สูงอายุ และผู้พิการเสียเปรียบในการเข้าถึงสิทธิที่ตนเองมี</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">PAIN POINT 03</div>
+        <h4>Repetitive Staff Work — เจ้าหน้าที่ติดอยู่กับงานที่ AI ทำได้</h4>
+        <p>การคัดกรองเอกสาร จัดประเภทเคส จ่ายงาน ติดตามสถานะ และตอบคำถามซ้ำ ๆ กินเวลาเจ้าหน้าที่ที่ควรได้ใช้กับงานที่ต้องใช้วิจารณญาณ — งานวิจัยภาครัฐทั่วโลกพบว่า AI case management ลด case backlog ได้ 50% และลดภาระงานบริหาร 30%</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">PAIN POINT 04</div>
+        <h4>Data-Rich, Insight-Poor — มีข้อมูลแต่ผู้บริหารตัดสินใจแบบเดิม</h4>
+        <p>แอป my GLO เก็บราคาขายจริง พิกัดจุดจำหน่าย พฤติกรรมผู้ซื้อไว้แล้ว แต่ข้อมูลยังไม่ถูกแปลงเป็น actionable insight — "ใครขายเกินราคา ที่ไหน เมื่อไหร่ เคสร้องเรียนประเภทไหนเพิ่มขึ้น ทีมไหน SLA ตก" ยังต้องรอรายงานรายเดือนแทนที่จะเห็นทันที</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>ทำไมต้องแก้ตอนนี้:</strong> ปริมาณ interaction ของ GLO กำลังเร่งขึ้นจากสลากดิจิทัล 27 ล้านใบบน Paotang ภาครัฐไทยมี momentum ที่ชัดเจน (Cloud-First, National AI Strategy, Tech for Gov 2025) และเทคโนโลยีพร้อมแล้ว — GOV.UK Chat บน Claude/AWS Bedrock ทำ 90% accuracy ขณะที่ Ireland MyWelfare อนุมัติเคสสวัสดิการอัตโนมัติได้ 83–98%
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOLUTION OVERVIEW ============ -->
+<section class="cream">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 3 · Proposed Solution</div>
+      <h2>รายละเอียดโซลูชันและนวัตกรรม</h2>
+      <p class="lede">
+        GLO TrustFlow AI คือแพลตฟอร์มจัดการเคสอัจฉริยะแบบ end-to-end ที่ทำหน้าที่เป็น "ชั้นบริการ" (service layer) วางทับระบบเดิมของ GLO โดยไม่ต้องรื้อ core system ต่างจาก chatbot ทั่วไปที่ตอบคำถามได้แต่ไม่จัดการเคสจริง — TrustFlow ทำงานครบวงจรตั้งแต่ผู้ใช้กดส่งเรื่องครั้งแรก จนถึงการปิดเคสและรายงานผลในระดับองค์กร
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-bar"></div>
+        <div class="card-num">PERSONA 01</div>
+        <h4>ฝั่งประชาชน / ตัวแทน</h4>
+        <p>เข้าผ่านช่องทางใดก็ได้ — เว็บ GLO, my GLO, LINE OA, call center — ระบบทักทายและสอบถามด้วยภาษาไทยธรรมชาติ รับข้อมูล multimodal (ภาพ/เสียง/พิมพ์) ตรวจความสมบูรณ์ทันที ออกเลขเคสและ ETA อัปเดต status real-time</p>
+        <div class="tag-row">
+          <span class="tag">Mobile-first</span>
+          <span class="tag">Voice-enabled</span>
+          <span class="tag">Multimodal</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">PERSONA 02</div>
+        <h4>ฝั่งเจ้าหน้าที่ GLO</h4>
+        <p>เห็นเคสที่จัดลำดับความสำคัญแล้ว พร้อม AI Co-pilot Panel ที่แสดง: ข้อมูลสกัดจากเอกสาร · confidence score ของ AI · คำแนะนำขั้นถัดไป · ปุ่ม "เห็นด้วย / แก้ไข / Escalate" ที่ทุกการกดถูกบันทึก audit log</p>
+        <div class="tag-row">
+          <span class="tag">AI Co-pilot</span>
+          <span class="tag">Confidence-aware</span>
+          <span class="tag">Audited</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-bar maroon"></div>
+        <div class="card-num">PERSONA 03</div>
+        <h4>ฝั่งผู้บริหาร GLO</h4>
+        <p>Dashboard pipeline สดของทุกเคส · Process Mining View ที่โชว์เส้นทางจริง vs ที่ออกแบบไว้ · Anomaly Alerts สำหรับเคสผิดปกติ · People-Planet Ledger ที่เปิดเผยต่อสาธารณะ — กระดาษประหยัด, CO₂ ลด, เวลาคืน</p>
+        <div class="tag-row">
+          <span class="tag">Real-time KPI</span>
+          <span class="tag">Process Mining</span>
+          <span class="tag">Public Ledger</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE — FIGURE 1 ============ -->
+<section id="architecture">
+  <div class="container-wide">
+    <div class="section-head">
+      <div class="section-tag">Section 4 · Solution Architecture</div>
+      <h2>สถาปัตยกรรมระบบ — Layered View</h2>
+      <p class="lede">
+        TrustFlow ประกอบด้วย 4 layer หลักที่เรียงตามลำดับการประมวลผลของเคส และ Trust Stack ที่เป็น cross-cutting concern ครอบทุกชั้น — ออกแบบแบบ non-invasive overlay ให้เชื่อมต่อกับระบบเดิมของ GLO ผ่าน API contract มาตรฐาน
+      </p>
+    </div>
+
+    <div class="figure">
+      <div class="figure-head">
+        <div>
+          <div class="figure-label">FIGURE 1.0 · TRF-ARCH-001</div>
+          <div class="figure-title">Solution Architecture — 5-Layer Platform with Cross-Cutting Trust Stack</div>
+        </div>
+        <div class="figure-ref">SECTION 3.3</div>
+      </div>
+      <img class="figure-img" src="./glo-trustflow-architecture.svg" alt="GLO TrustFlow AI Solution Architecture — 5 Layer with Trust Stack">
+      <div class="figure-caption">
+        แผนภาพแสดง 5 ชั้นของ TrustFlow Platform — User Channels ด้านบน · Layer 1 Multimodal Intake · Layer 2 AI Reasoning · Layer 3 Case Orchestration · Layer 4 Process Mining + Ledger · Trust Stack เป็น vertical column ทางขวาที่บังคับใช้ในทุกชั้น · GLO Core Systems ด้านล่างที่เชื่อมต่อแบบ non-invasive
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTEXT — FIGURE 2 ============ -->
+<section class="alt">
+  <div class="container-wide">
+    <div class="section-head">
+      <div class="section-tag">Section 4.2 · Solution Context</div>
+      <h2>ภาพรวมบริบทระบบ — System Context (C4 Level 1)</h2>
+      <p class="lede">
+        Context diagram ตามมาตรฐาน C4 Model Level 1 แสดงความสัมพันธ์ของ TrustFlow Platform กับ external actors (ประชาชน · ตัวแทน · เจ้าหน้าที่ · ผู้บริหาร · auditor) · interaction channels · governance frameworks ที่บังคับใช้ · และ existing GLO core systems ที่เชื่อมต่อด้วย API
+      </p>
+    </div>
+
+    <div class="figure">
+      <div class="figure-head">
+        <div>
+          <div class="figure-label">FIGURE 2.0 · TRF-ARCH-002</div>
+          <div class="figure-title">System Context Diagram — TrustFlow Ecosystem View</div>
+        </div>
+        <div class="figure-ref">SECTION 3.3.2</div>
+      </div>
+      <img class="figure-img" src="./glo-trustflow-context-diagram.svg" alt="GLO TrustFlow AI System Context Diagram">
+      <div class="figure-caption">
+        ภาพแสดง 5 actors (primary &amp; secondary) ด้านบน, 5 interaction channels ฝั่งซ้าย, TrustFlow Platform (system under design) ตรงกลาง, 5 governance frameworks ฝั่งขวาที่ทำหน้าที่บังคับใช้ compliance, และ 5 existing GLO core systems ด้านล่างที่เชื่อมต่อแบบ preserved/integrated ไม่ใช่ replaced
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SEQUENCE FLOWS (DARK) ============ -->
+<section class="dark" id="flows">
+  <div class="container-wide">
+    <div class="section-head">
+      <div class="section-tag" style="background:#1A2D45; color:var(--gold-light); border-color:#1E3A5F;">Section 5 · Sequence Flows</div>
+      <h2 style="color:#F8FAFC;">End-to-End Process Flows</h2>
+      <p class="lede" style="color:#94A3B8;">
+        Sequence diagrams สำหรับ workflow หลักของ TrustFlow — แสดงการประสานงานของ component ต่าง ๆ ในแต่ละ scenario ตั้งแต่ user action จนถึง output การจัดการ confidence gate, human override, audit trail, และ public ledger update
+      </p>
+    </div>
+
+    <!-- SEQ-01 -->
+    <div class="seq-block">
+      <div class="seq-head">
+        <div>
+          <div class="seq-label">FIGURE 3.1 · TRF-SEQ-001</div>
+          <div class="seq-title">Workflow A — สลากชำรุดพรีเช็ก (Auto-Triage End-to-End)</div>
+        </div>
+        <div class="seq-ref">SECTION 3.2.1</div>
+      </div>
+      <div class="seq-desc">
+        เคสที่ประชาชนส่งภาพสลากชำรุดเข้ามา ระบบจะตรวจความสมบูรณ์ของภาพ สกัดข้อมูล ประเมิน confidence แล้วแยกเส้นทางออกเป็น 2 branch — auto-clear สำหรับเคสง่าย หรือส่งให้เจ้าหน้าที่พิจารณาพร้อม AI Co-pilot Panel
+      </div>
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Citizen as ประชาชน
+    participant CH as Channel<br/>(my GLO / LINE)
+    participant L1 as L1 Multimodal Intake
+    participant L2 as L2 AI Reasoning
+    participant TS as TS Trust Stack
+    participant L3 as L3 Orchestration
+    actor Officer as เจ้าหน้าที่ GLO
+    participant L4 as L4 Public Ledger
+
+    Citizen->>CH: ส่งภาพสลากชำรุด + เหตุผล
+    CH->>L1: forward multimodal input
+    L1->>L1: OCR สกัดเลขเซต/งวด<br/>Vision ตรวจความสมบูรณ์
+
+    alt ภาพไม่สมบูรณ์
+        L1-->>Citizen: ขอภาพมุมที่ขาดเพิ่ม
+        Citizen->>CH: ส่งภาพชุดใหม่
+    end
+
+    L1->>L2: structured payload
+    L2->>L2: classify case + RAG retrieve<br/>compute confidence score
+    L2->>TS: confidence gate check
+
+    alt Confidence ≥ 0.90 + Risk Low
+        TS-->>L3: auto-approve
+        L3-->>Citizen: แจ้งผล + เลขเคส + ETA
+        L3->>L4: log impact metrics
+    else Confidence &lt; 0.90 หรือ Risk Mid+
+        TS-->>L3: route to officer
+        L3->>Officer: queue + AI Co-pilot Panel
+        Officer->>Officer: review + decide
+        Officer->>TS: log decision + reason
+        TS->>L3: signed audit trail
+        L3-->>Citizen: แจ้งผล + เลขเคส
+        L3->>L4: log impact + accessibility
+    end
+
+    Note over L4: Public REST API publishes real-time:<br/>CO₂ saved · time returned · accessibility cases
+      </pre>
+    </div>
+
+    <!-- SEQ-02 -->
+    <div class="seq-block">
+      <div class="seq-head">
+        <div>
+          <div class="seq-label">FIGURE 3.2 · TRF-SEQ-002</div>
+          <div class="seq-title">Knowledge Base Ingestion (RAG Setup)</div>
+        </div>
+        <div class="seq-ref">SECTION 3.3 · L2.02</div>
+      </div>
+      <div class="seq-desc">
+        Pipeline สำหรับสร้าง vector knowledge base จากระเบียบ GLO, FAQ และเคสในอดีต — เอกสารถูก extract, normalize, chunk พร้อม overlap แล้ว embed ก่อนเก็บใน PostgreSQL+pgvector ใช้สำหรับ RAG retrieval ของ L2 AI Reasoning
+      </div>
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin as Admin (GLO)
+    participant API
+    participant Loader
+    participant Embedder
+    participant DB as PostgreSQL+pgvector
+
+    Admin->>API: POST /v1/documents/text or upload<br/>(ระเบียบ · FAQ · past cases)
+    API->>Loader: extract text
+    Loader-->>API: raw text
+    API->>API: normalize + chunk + overlap<br/>(Thai-aware tokenization)
+    API->>Embedder: embed chunks
+    Embedder-->>API: vectors (1536-dim)
+    API->>DB: save document + chunks + vectors
+    DB-->>API: indexed ids
+    API-->>Admin: ingest summary + chunk count
+      </pre>
+    </div>
+
+    <!-- SEQ-03 -->
+    <div class="seq-block">
+      <div class="seq-head">
+        <div>
+          <div class="seq-label">FIGURE 3.3 · TRF-SEQ-003</div>
+          <div class="seq-title">Citizen RAG Chat (Inquiry &amp; FAQ)</div>
+        </div>
+        <div class="seq-ref">SECTION 3.3 · L2.01 + L2.02</div>
+      </div>
+      <div class="seq-desc">
+        เมื่อประชาชนถามคำถามทั่วไปผ่าน LINE หรือเว็บ — ระบบจะ rate limit, lookup cache, embed คำถาม, vector search top-k chunks จาก knowledge base, สร้าง Thai RAG prompt, แล้วเรียก LLM พร้อมบันทึก trace สำหรับ audit
+      </div>
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as ประชาชน
+    participant API
+    participant Redis
+    participant DB as PostgreSQL+pgvector
+    participant LLM as Claude / vLLM
+
+    User->>API: POST /v1/chat + X-Tenant-ID
+    API->>Redis: rate limit
+    API->>DB: get/create tenant + conversation
+    par async
+        API->>Redis: response cache lookup
+        API->>API: embed user question
+    end
+    API->>DB: vector search top-k chunks
+    API->>API: build Thai RAG prompt<br/>(with PII masking applied)
+    API->>LLM: async chat/completions
+    LLM-->>API: answer + citations
+    API->>DB: save messages + inference trace
+    API->>Redis: cache answer (TTL 24h)
+    API-->>User: answer + sources
+      </pre>
+    </div>
+
+    <!-- SEQ-04 -->
+    <div class="seq-block">
+      <div class="seq-head">
+        <div>
+          <div class="seq-label">FIGURE 3.4 · TRF-SEQ-004</div>
+          <div class="seq-title">Officer Override with Signed Audit Trail</div>
+        </div>
+        <div class="seq-ref">SECTION 3.3 · TS.02 + TS.03</div>
+      </div>
+      <div class="seq-desc">
+        ในกรณีที่เจ้าหน้าที่ไม่เห็นด้วยกับคำแนะนำของ AI — Trust Stack บังคับให้ต้องระบุเหตุผลก่อน override และทุก decision จะถูก sign แบบ cryptographic chain เพื่อรองรับการตรวจสอบของ ISO 9001 และ WLA-SCS
+      </div>
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Officer as เจ้าหน้าที่ GLO
+    participant UI as AI Co-pilot Panel
+    participant L2 as L2 AI Reasoning
+    participant TS as TS Trust Stack
+    participant L3 as L3 Orchestration
+    participant Audit as Audit Log Service
+    participant Manager as ผู้บริหาร / Auditor
+
+    Officer->>UI: เปิดเคส #C-2569-00845
+    UI->>L2: fetch AI recommendation
+    L2-->>UI: recommendation + confidence 0.72
+    UI->>Officer: แสดง extracted data + AI suggestion
+
+    alt เห็นด้วยกับ AI
+        Officer->>UI: คลิก "เห็นด้วย"
+        UI->>TS: confirm decision (concur)
+    else ไม่เห็นด้วย → Override
+        Officer->>UI: คลิก "Override"
+        UI->>Officer: บังคับใส่เหตุผล (ห้ามว่าง)
+        Officer->>UI: ระบุเหตุผล + ทางเลือกอื่น
+        UI->>TS: override decision + justification
+    end
+
+    TS->>TS: sign event with HSM key<br/>append to immutable chain
+    TS->>Audit: signed event log entry
+    Audit-->>Manager: real-time audit feed
+    TS->>L3: update case state
+    L3-->>Officer: action confirmed
+      </pre>
+    </div>
+
+    <!-- SEQ-05 -->
+    <div class="seq-block">
+      <div class="seq-head">
+        <div>
+          <div class="seq-label">FIGURE 3.5 · TRF-SEQ-005</div>
+          <div class="seq-title">Anomaly Detection → Manager Alert (Process Mining)</div>
+        </div>
+        <div class="seq-ref">SECTION 3.3 · L4.02 + L4.03</div>
+      </div>
+      <div class="seq-desc">
+        Layer 4 monitor my GLO data feed อย่างต่อเนื่อง เมื่อพบ pattern ผิดปกติ (เช่น เคลมสลากชำรุดถี่ผิดปกติจากบุคคลเดียวกัน) จะ trigger anomaly alert พร้อมส่งให้ผู้บริหารใน dashboard real-time
+      </div>
+      <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant MyGLO as my GLO Data Lake
+    participant L4a as L4.01 Process Mining
+    participant L4b as L4.02 Anomaly Detection
+    participant L4c as L4.03 Dashboard
+    actor Manager as ผู้บริหาร GLO
+
+    loop ทุก 5 นาที
+        MyGLO->>L4a: stream new events
+        L4a->>L4a: update process model
+        L4a->>L4b: forward event window
+        L4b->>L4b: time-series + clustering<br/>(scikit-learn / PyOD)
+
+        alt Anomaly score &gt; threshold
+            L4b->>L4c: emit alert<br/>{type, severity, context}
+            L4c-->>Manager: push notification + dashboard badge
+            Manager->>L4c: เปิด anomaly detail
+            L4c-->>Manager: root cause trace + linked cases
+        else Normal
+            L4b->>L4c: update baseline metrics
+        end
+    end
+
+    Note over L4c: ทุก alert ถูก log สำหรับ<br/>compliance review ของ auditor
+      </pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ TRUST STACK DETAIL ============ -->
+<section id="trust">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 6 · Trust Stack Detail</div>
+      <h2>Trust Stack — 7 องค์ประกอบที่ครอบทุก Layer</h2>
+      <p class="lede">
+        Trust Stack ไม่ใช่ "ฟีเจอร์ความปลอดภัย" ที่เติมในขั้นตอน production แต่เป็น layer แนวตั้งที่ปรากฏในผังสถาปัตยกรรมตั้งแต่บรรทัดแรกของโค้ด — สอดคล้องกับแนวทาง GOV.UK Chat ที่ใช้ LLM-as-a-judge + manual evaluation + red teaming ร่วมกับ AI Security Institute (AISI) และ NIST AI Risk Management Framework
+      </p>
+    </div>
+
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-num">TS.01 · CONFIDENCE GATE</div>
+        <h4>Confidence Threshold Gates</h4>
+        <p>เคสที่ AI confidence ต่ำกว่าเกณฑ์ที่ตั้งไว้ ถูก routed ไปให้เจ้าหน้าที่ทันที — calibrated probability ไม่ใช่แค่ softmax</p>
+        <div class="trust-cite">Pattern reference: Ireland MyWelfare (auto-approve 83-98%)</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-num">TS.02 · HUMAN OVERRIDE</div>
+        <h4>Human Override Always</h4>
+        <p>เจ้าหน้าที่สามารถ overrule AI decision ได้ทุกเคส พร้อมเหตุผลที่ถูกบังคับให้ระบุ และถูกบันทึก audit log อย่างสมบูรณ์</p>
+        <div class="trust-cite">Aligned with NIST AI RMF GOVERN-1.2</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-num">TS.03 · AUDIT TRAIL</div>
+        <h4>Immutable Signed Audit Trail</h4>
+        <p>ทุก event ถูก sign ดิจิทัลด้วย HSM key และต่อเป็น cryptographic chain — สามารถพิสูจน์ได้ว่าไม่มีการแก้ไขย้อนหลัง</p>
+        <div class="trust-cite">ISO 9001:2015 · WLA-SCS compliant</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-num">TS.04 · PII MASKING</div>
+        <h4>PII Masking Layer</h4>
+        <p>เลขประจำตัวประชาชน เลขบัญชี ที่อยู่ ถูก mask ก่อนเข้า LLM ใช้ token-based replacement ที่ reversible ใน secure context</p>
+        <div class="trust-cite">พ.ร.บ. PDPA · Microsoft Presidio / AWS Comprehend</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-num">TS.05 · RED TEAM</div>
+        <h4>Red-Team Test Harness</h4>
+        <p>Pre-deployment battery สำหรับ jailbreak + prompt injection + adversarial input — รัน automated ทุก deploy</p>
+        <div class="trust-cite">GOV.UK Chat blocked 508 / 508 attempts · Garak / PyRIT</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-num">TS.06 · LLM JUDGE</div>
+        <h4>LLM-as-a-Judge Monitoring</h4>
+        <p>Continuous quality assurance — สุ่ม sample AI response แล้วใช้ second LLM ประเมินคุณภาพเทียบกับ rubric ที่ calibrated กับ human reviewer</p>
+        <div class="trust-cite">Industry best practice · calibrated drift detection</div>
+      </div>
+      <div class="trust-card" style="grid-column: span 2;">
+        <div class="trust-num">TS.07 · WLA-RGF AWARENESS</div>
+        <h4>WLA Responsible Gaming Framework Pattern Detector</h4>
+        <p>ระบบรู้จัก pattern ที่อาจเข้าข่ายความรับผิดชอบของ lottery operator (self-exclusion, vulnerable user signals, problem gambling indicators) เป็น first-class component ของสถาปัตยกรรม ไม่ใช่ add-on ที่เติมทีหลัง — สถิติของ WLA ปี 2025 ระบุว่า lottery operator ที่ certify WLA-RGF Level 2-4 ขยับจาก 65% (2022) เป็น 84% (2025) สัญญาณว่า operator ที่ไม่ขยับด้านความรับผิดชอบจะกลายเป็นกลุ่มน้อยในไม่ช้า</p>
+        <div class="trust-cite">WLA Responsible Gaming Framework Level 2-4 certification path</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INNOVATION POINTS ============ -->
+<section class="alt" id="innovation">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 7 · Innovation</div>
+      <h2>นวัตกรรม 7 จุดที่ยังไม่มีคู่แข่งทำพร้อมกัน</h2>
+      <p class="lede">
+        เทคโนโลยี LLM, OCR, process mining, workflow engine มีคนใช้แล้วทั่วโลก — สิ่งที่ทำให้ TrustFlow ล้ำหน้าคือ "วิธีประกอบเข้าด้วยกันในบริบทเฉพาะของ national lottery ที่ Trust สำคัญที่สุด"
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">INNOVATION 01</div>
+        <h4>Lottery-Aware Responsible-by-Design</h4>
+        <p>ฝัง WLA-RGF risk pattern detector เป็น first-class component ในทุก layer — Salesforce Gov Cloud, Microsoft Power Platform, ServiceNow ไม่ทำ เพราะออกแบบเป็น horizontal product</p>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">INNOVATION 02</div>
+        <h4>Accessibility-First Lane</h4>
+        <p>Voice-first ภาษาไทย, audio status update, proxy submitter สำหรับผู้ดูแล — เป็น "ช่องทางเทียบเท่า" ไม่ใช่ "feature เสริม" รองรับผู้พิการ ผู้สูงอายุ low digital literacy</p>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">INNOVATION 03</div>
+        <h4>Process Mining Live Twin</h4>
+        <p>X-ray เส้นทางจริงของเคส — Accenture ค้นพบ 14,000 path ของ requisition ใน SAP Ariba ผ่านวิธีนี้ GLO จะเห็นได้ว่า "เคสตั๋วเสีย" จริง ๆ เดินกี่ทาง</p>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">INNOVATION 04</div>
+        <h4>Public People-Planet Ledger</h4>
+        <p>Publish impact metrics เป็น real-time public dashboard ต่อยอดแนวคิดจาก Allwyn report "Future of Lottery: A Game for Change" สำหรับ operational sustainability</p>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">INNOVATION 05</div>
+        <h4>Auto-Clear with Measured Autonomy</h4>
+        <p>เคสง่ายอนุมัติอัตโนมัติเมื่อ confidence สูง risk ต่ำ เคสยากส่ง officer พร้อม AI assist — Ireland MyWelfare ทำได้ 83% (illness) และ 98% (treatment)</p>
+      </div>
+      <div class="card">
+        <div class="card-bar gold"></div>
+        <div class="card-num">INNOVATION 06</div>
+        <h4>Thai-First Architecture</h4>
+        <p>Thai NLP + Thai OCR + Thai voice เป็นแกนการออกแบบ ไม่ใช่ระบบอังกฤษที่แปลไทย — เหมือนที่ Thailand Post พิสูจน์ใน CPTA Digital Post (Tech for Gov 2025)</p>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="card" style="border-left:4px solid var(--maroon);">
+        <div class="card-bar maroon"></div>
+        <div class="card-num">INNOVATION 07 · KEY DIFFERENTIATOR</div>
+        <h4>Trust Stack เป็น Architecture Citizen ไม่ใช่ Add-on</h4>
+        <p>Confidence threshold, human override, signed audit trail, PII masking, red-team test เป็น layer แนวตั้งที่เห็นในสถาปัตยกรรมตั้งแต่หน้าแรก ไม่ใช่ "ติดความปลอดภัยตอนเดือนสุดท้าย" — สอดคล้องกับแนวทาง GOV.UK Chat ที่ใช้ LLM-as-a-judge + red teaming ร่วมกับ AI Security Institute และ NIST AI Risk Management Framework</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARISON MATRIX ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 7.1 · Competitive Comparison</div>
+      <h2>เปรียบเทียบกับสิ่งที่มีอยู่ในปัจจุบัน</h2>
+    </div>
+
+    <div class="compare">
+      <table>
+        <thead>
+          <tr>
+            <th>มิติเปรียบเทียบ</th>
+            <th>Chatbot รัฐทั่วไป</th>
+            <th>IDP / Document AI</th>
+            <th>Salesforce Gov Cloud</th>
+            <th class="us">GLO TrustFlow AI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Multimodal Intake (ภาพ/เสียง/วิดีโอ)</td>
+            <td class="partial">เฉพาะ chat</td>
+            <td class="partial">เน้นเอกสาร</td>
+            <td class="partial">ต้อง add-on</td>
+            <td class="us"><span class="yes">ครบ</span></td>
+          </tr>
+          <tr>
+            <td>End-to-end Case Lifecycle</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="yes">มี</td>
+            <td class="us"><span class="yes">มี</span></td>
+          </tr>
+          <tr>
+            <td>Process Mining ในระบบ</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="partial">ต้อง partner</td>
+            <td class="us"><span class="yes">in-box</span></td>
+          </tr>
+          <tr>
+            <td>WLA-RGF Risk Awareness</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="us"><span class="yes">first-class</span></td>
+          </tr>
+          <tr>
+            <td>Thai-First (NLP/OCR/Voice)</td>
+            <td class="partial">retrofitted</td>
+            <td class="partial">retrofitted</td>
+            <td class="partial">retrofitted</td>
+            <td class="us"><span class="yes">purpose-built</span></td>
+          </tr>
+          <tr>
+            <td>Accessibility-First Lane</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="partial">optional</td>
+            <td class="us"><span class="yes">equal channel</span></td>
+          </tr>
+          <tr>
+            <td>Public-Facing Impact Ledger</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="no">—</td>
+            <td class="us"><span class="yes">open API</span></td>
+          </tr>
+          <tr>
+            <td>Trust Stack เห็นในสถาปัตยกรรม</td>
+            <td class="partial">implicit</td>
+            <td class="partial">implicit</td>
+            <td class="partial">implicit</td>
+            <td class="us"><span class="yes">visible layer</span></td>
+          </tr>
+          <tr>
+            <td>Auto-Clear with Measured Autonomy</td>
+            <td class="no">—</td>
+            <td class="partial">thresholds</td>
+            <td class="partial">rule-based</td>
+            <td class="us"><span class="yes">confidence + risk hybrid</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECHNOLOGY STACK ============ -->
+<section class="alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 8 · Technology Stack</div>
+      <h2>เทคโนโลยีที่เลือกใช้ในแต่ละ Layer</h2>
+      <p class="lede">เลือก stack ที่ industry-standard และ proven in production แทน proprietary stack ที่ผูกขาด — ทุก component มี fallback / alternative provider เพื่อลดความเสี่ยง vendor lock-in</p>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:8%;">Layer</th>
+          <th style="width:22%;">Component</th>
+          <th style="width:35%;">Technology Options</th>
+          <th style="width:15%;">Licensing</th>
+          <th>Rationale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="code">L1.01</span></td><td>OCR</td><td>Mistral OCR 3, Azure Document Intelligence, Tesseract</td><td>Commercial / Hybrid</td><td>99.2% accuracy ในปี 2026, รองรับเอกสารราชการไทย</td></tr>
+        <tr><td><span class="code">L1.02</span></td><td>Thai NLP</td><td>PyThaiNLP, WangchanBERTa, Hugging Face Thai models</td><td>Open Source</td><td>Thai-native tokenization และ NER</td></tr>
+        <tr><td><span class="code">L1.03</span></td><td>ASR</td><td>OpenAI Whisper, wav2vec 2.0, Azure Speech</td><td>Open Source / Commercial</td><td>รองรับ Thai voice และภาษาถิ่น</td></tr>
+        <tr><td><span class="code">L1.04</span></td><td>Computer Vision</td><td>YOLOv8, OpenCV, custom CNN</td><td>Open Source</td><td>ตรวจสอบความถูกต้องของภาพสลาก</td></tr>
+        <tr><td><span class="code">L2.01</span></td><td>LLM</td><td>Claude (Anthropic API / AWS Bedrock), Llama 3, Mistral</td><td>Commercial / Open</td><td>GOV.UK Chat ใช้ Claude pattern เดียวกัน 90% accuracy</td></tr>
+        <tr><td><span class="code">L2.02</span></td><td>Vector Database</td><td>pgvector, Pinecone, Weaviate, Qdrant</td><td>Open Source / Commercial</td><td>pgvector ใช้ PostgreSQL ที่ทีม IT คุ้นเคยแล้ว</td></tr>
+        <tr><td><span class="code">L2.02</span></td><td>RAG Framework</td><td>LangChain, LlamaIndex</td><td>Open Source</td><td>Industry standard มี ecosystem ใหญ่</td></tr>
+        <tr><td><span class="code">L3.01</span></td><td>Workflow Engine</td><td>Camunda 8, Temporal, Apache Airflow</td><td>Open Source</td><td>Battle-tested in enterprise workflow orchestration</td></tr>
+        <tr><td><span class="code">L4.01</span></td><td>Process Mining</td><td>ProM, Apromore, Celonis</td><td>Open Source / Commercial</td><td>Accenture-validated สำหรับ enterprise scale</td></tr>
+        <tr><td><span class="code">L4.02</span></td><td>Anomaly Detection</td><td>scikit-learn, PyOD, custom models</td><td>Open Source</td><td>Time-series + clustering บนข้อมูล my GLO</td></tr>
+        <tr><td><span class="code">L4.03</span></td><td>Dashboard</td><td>Grafana, Metabase, Power BI</td><td>Open Source / Commercial</td><td>Self-service analytics สำหรับผู้บริหาร</td></tr>
+        <tr><td><span class="code">TS.03</span></td><td>Audit Signing</td><td>HashiCorp Vault, AWS KMS, custom HSM</td><td>Open Source / Commercial</td><td>Cryptographic signing ที่ผ่าน ISO 27001 audit</td></tr>
+        <tr><td><span class="code">TS.04</span></td><td>PII Detection</td><td>Microsoft Presidio, AWS Comprehend</td><td>Open Source / Commercial</td><td>PDPA-compliant masking ก่อนเข้า LLM</td></tr>
+        <tr><td><span class="code">TS.05</span></td><td>Red-Team Tools</td><td>Garak, PyRIT, custom prompt battery</td><td>Open Source</td><td>Automated jailbreak + injection testing</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ IMPLEMENTATION PLAN ============ -->
+<section id="plan">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 9 · Implementation Plan</div>
+      <h2>แผนการพัฒนาต้นแบบ — 6 เฟส</h2>
+      <p class="lede">
+        ใช้แนวทาง "Demo-First, Trust-First" — ทุกบรรทัดของโค้ดถามตัวเองว่า "สไลด์เดโม่จะใช้สิ่งนี้ไหม" และ "ผ่าน Trust Stack หรือยัง" เพื่อหลีกเลี่ยงปัญหาที่ MIT NANDA State of AI in Business 2025 ระบุว่ามีเพียง ~5% ของ enterprise GenAI pilots ที่สร้าง impact วัดได้ระดับ operational
+      </p>
+    </div>
+
+    <div class="timeline">
+      <div class="phase">
+        <div class="phase-num">PHASE 01 · DISCOVERY &amp; ALIGNMENT</div>
+        <h4>สัมภาษณ์ผู้มีส่วนได้ส่วนเสีย + รวบรวมตัวอย่างจริง</h4>
+        <p>สัมภาษณ์ผู้มีส่วนได้ส่วนเสีย 10-15 คน (เจ้าหน้าที่บริการ ตัวแทนจำหน่าย ผู้ซื้อ ผู้พิการ) + รวบรวมเอกสารตัวอย่างจริง (รูปสลากชำรุด ฟอร์มร้องเรียน บันทึก call center) เพื่อใช้เทรน OCR และ classification ทำ workflow mapping ของ Workflow A &amp; B</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">PHASE 02 · ARCHITECTURE &amp; UX DESIGN</div>
+        <h4>ออกแบบสถาปัตยกรรม 5 layer + 3 หน้าจอ</h4>
+        <p>ออกแบบสถาปัตยกรรมตาม 5 layers · เลือก concrete tech stack (Claude API, OCR provider, vector DB, workflow engine) · ออกแบบ wireframe สำหรับ 3 หน้าจอ (user/staff/manager) · ตั้ง schema ของ event log สำหรับ audit trail · กำหนด contract ของ People-Planet Ledger API</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">PHASE 03 · BUILD CORE STACK</div>
+        <h4>สร้าง Layer 1-3 แบบ thin vertical slice</h4>
+        <p>Multimodal intake → AI triage → case orchestration ใช้ open-source workflow engine (Camunda / Temporal) และ Claude + RAG สำหรับ AI brain — พัฒนาแบบ vertical slice (Workflow A ครบทั้ง pipeline ก่อน) แล้วค่อยขยายไป Workflow B เพื่อลดความเสี่ยง</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">PHASE 04 · BUILD DASHBOARD &amp; LEDGER</div>
+        <h4>Manager dashboard + Public People-Planet Ledger</h4>
+        <p>สร้าง manager dashboard ที่แสดง pipeline สด, SLA, anomaly และ People-Planet Ledger สำหรับ data ใช้แบบผสม (live จาก prototype + synthetic ที่ใกล้เคียง production load) เพื่อให้เห็นภาพ "ระบบเดินที่ scale จริง"</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">PHASE 05 · TRUST STACK INTEGRATION &amp; TESTING</div>
+        <h4>เพิ่ม Trust Stack เข้าทุก layer + Red-team test</h4>
+        <p>เพิ่ม confidence threshold, human override UI, PII masking, signed audit trail · Red-team test (jailbreak / prompt injection) ตาม pattern GOV.UK Chat (508/508 blocked) · LLM-as-a-judge เพื่อวัด accuracy baseline · Accessibility audit (WCAG 2.1 AA)</p>
+      </div>
+      <div class="phase">
+        <div class="phase-num">PHASE 06 · PILOT, REFINE &amp; DEMO PREP</div>
+        <h4>ทดสอบกับผู้ใช้จริง + เตรียม demo</h4>
+        <p>ทดสอบกับผู้ใช้จริง 5-10 คน (proxy users สำหรับ workflow ที่อ่อนไหว) · เก็บ feedback แล้ว iterate · ทำสคริปต์เดโม่ + อัด backup demo video · ทำ pitch deck ฉบับสุดท้าย · เตรียม Q&amp;A สำหรับกรรมการ</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>หลักการตลอดทุกเฟส:</strong> Modular &amp; cloud-native (ทุก layer deploy แยกได้บน AWS หรือ private cloud) · Iterate-to-90 mindset (GOV.UK Chat เริ่ม 76% → 90% ผ่านการ iterate) · Mock-first, real-second · Fallback plans สำหรับทุก component สำคัญ
+    </div>
+  </div>
+</section>
+
+<!-- ============ IMPACT ============ -->
+<section class="cream" id="impact">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 10 · Impact &amp; Value</div>
+      <h2>ผลกระทบและคุณค่าที่วัดได้</h2>
+      <p class="lede">
+        ทุกตัวเลขมี proof-of-concept จาก deployment ของรัฐบาลชั้นนำของโลกรองรับ ทำให้ผลลัพธ์เหล่านี้ไม่ใช่ "เคลม" แต่เป็น "เป้าหมายที่มีหลักฐานสนับสนุน"
+      </p>
+    </div>
+
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="impact-label">TIME · ลดเวลา</div>
+        <div class="impact-num">60–80%</div>
+        <div class="impact-desc">Lead time ลดลงในเคสที่เข้าเกณฑ์ auto-clear — จาก "ครึ่งวันถึงหนึ่งวัน" เหลือ "ไม่กี่นาที" ผ่านมือถือ</div>
+        <div class="impact-bench">Benchmark: Ireland MyWelfare 83-98% auto-approve</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">COST · ลดต้นทุน</div>
+        <div class="impact-num">30–40%</div>
+        <div class="impact-desc">Processing cost ลดลงตามมาตรฐาน IDP — ~3 ล้านบาท/ปี เป็นจุดเริ่มต้นที่ 100K เคส/ปี (เพิ่มเมื่อรวม call center)</div>
+        <div class="impact-bench">Benchmark: IDP industry · payback 12-24 เดือน</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">EFFICIENCY · ประสิทธิภาพ</div>
+        <div class="impact-num">≥ 88%</div>
+        <div class="impact-desc">AI Triage Accuracy ตั้งแต่ MVP · เจ้าหน้าที่จัดการเคสได้ 2-3 เท่าของเดิม · ผู้บริหารเห็น bottleneck แบบวินาที</div>
+        <div class="impact-bench">Benchmark: GOV.UK Chat 88-90% accuracy</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">PEOPLE · ประโยชน์ต่อสังคม</div>
+        <div class="impact-num">≥ 95%</div>
+        <div class="impact-desc">เคสจากกลุ่มเปราะบางผ่านระบบสำเร็จโดยไม่ต้องเดินทาง · เปิด Accessibility-First Lane สำหรับผู้พิการ ผู้สูงอายุ และ low digital literacy</div>
+        <div class="impact-bench">Benchmark: EY guidance + Estonia model</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">PLANET · ลด CO₂</div>
+        <div class="impact-num">~2,500 kg</div>
+        <div class="impact-desc">CO₂ ลดต่อปี (เริ่มต้น) จาก 100K เคส × 5 หน้า/เคส = 500,000 หน้า ลดลง — เมื่อขยาย scale ไปทุก workflow จะเป็นหลักหมื่น</div>
+        <div class="impact-bench">UNCTAD Vanuatu: 2 procedures = 5,827 kg CO₂</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-label">TRUST · ป้องกันทุจริต</div>
+        <div class="impact-num">+ 30%</div>
+        <div class="impact-desc">Detection rate ของเคสที่อาจเป็น fraud หรือผิดปกติ พร้อม signed audit trail ครบทุก decision · Public People-Planet Ledger สิ่งแรกในประเภทนี้สำหรับ national lottery ใน ASEAN</div>
+        <div class="impact-bench">Anomaly detection industry benchmark</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPLIANCE ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 11 · Compliance &amp; Standards</div>
+      <h2>มาตรฐานและ Framework ที่บังคับใช้</h2>
+      <p class="lede">TrustFlow ออกแบบให้สอดคล้องกับมาตรฐานสากลและกฎหมายไทยตั้งแต่บรรทัดแรก ไม่ใช่ retrofit ภายหลัง</p>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:25%;">มาตรฐาน</th>
+          <th style="width:25%;">ขอบเขต</th>
+          <th>การบังคับใช้ใน TrustFlow</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>ISO 9001:2015</strong></td><td>Quality Management System</td><td>GLO มีอยู่แล้วในกระบวนการพิมพ์ การจ่ายรางวัล การออกรางวัล — TrustFlow audit trail ขยายขอบเขตให้ครอบคลุมเคสจัดการประจำวัน</td></tr>
+        <tr><td><strong>ISO 27001</strong></td><td>Information Security Management</td><td>Role-based access control · encryption at rest &amp; in transit · key management ผ่าน HSM</td></tr>
+        <tr><td><strong>ISO 14001</strong></td><td>Environmental Management</td><td>GLO มีอยู่แล้ว — People-Planet Ledger สนับสนุน ESG reporting</td></tr>
+        <tr><td><strong>WLA-SCS</strong></td><td>Security Control Standard (World Lottery Association)</td><td>Audit trail + access control + change management ผ่าน Trust Stack TS.02 + TS.03</td></tr>
+        <tr><td><strong>WLA-RGF Level 2-4</strong></td><td>Responsible Gaming Framework</td><td>TS.07 WLA-RGF Pattern Detector เป็น first-class — รู้จัก self-exclusion, vulnerable user signals, problem gambling indicators</td></tr>
+        <tr><td><strong>NIST AI RMF 1.0</strong></td><td>AI Risk Management Framework</td><td>GOVERN-1.2 (human oversight) ผ่าน TS.02 · MEASURE-2.5 (red teaming) ผ่าน TS.05 · MANAGE-2 (incident response) ใน Trust Stack</td></tr>
+        <tr><td><strong>OECD AI Principles</strong></td><td>Trustworthy AI</td><td>Transparency, accountability, robustness ผ่าน Trust Stack ทั้ง 7 องค์ประกอบ</td></tr>
+        <tr><td><strong>WCAG 2.1 AA</strong></td><td>Web Content Accessibility Guidelines</td><td>Accessibility-First Lane สำหรับผู้พิการ + audit ของ user-facing UI ทุก release</td></tr>
+        <tr><td><strong>พ.ร.บ. PDPA</strong></td><td>การคุ้มครองข้อมูลส่วนบุคคล</td><td>TS.04 PII Masking Layer · ตัวเลือก deploy LLM แบบ on-premise หาก GLO กำหนดให้ข้อมูลห้ามออกนอกราชอาณาจักร</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PRECEDENTS ============ -->
+<section class="alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Section 12 · References &amp; Precedents</div>
+      <h2>Precedent ที่อ้างอิง</h2>
+      <p class="lede">TrustFlow ไม่ใช่ "นวัตกรรมในห้องวิจัย" — เป็นการประกอบเทคโนโลยีที่มีคนใช้งานจริงระดับ production ทั่วโลก</p>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h3 style="font-size:1.1rem; margin-bottom:16px; color:var(--gold);">ในประเทศไทย</h3>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-bar"></div>
+          <h4>Lert-Na (สำนักงาน ก.พ.ร.)</h4>
+          <p>ชนะ Efficiency Category ของ Tech for Gov 2025 — AI ช่วยคัดกรองเอกสารส่งประกวด</p>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-bar"></div>
+          <h4>CPTA Digital Post (ไปรษณีย์ไทย)</h4>
+          <p>ได้รางวัล Experience Category Tech for Gov 2025 — AI Document Intelligence สำหรับเอกสารไทย</p>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-bar"></div>
+          <h4>AI-Din (กรมที่ดิน)</h4>
+          <p>Grand Prize Winner ของ Tech for Gov 2025</p>
+        </div>
+        <div class="card">
+          <div class="card-bar"></div>
+          <h4>DGA Citizen Impact Excellence</h4>
+          <p>ได้รางวัล AWS Public Sector Day 2025</p>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:1.1rem; margin-bottom:16px; color:var(--gold);">ในต่างประเทศ</h3>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-bar gold"></div>
+          <h4>GOV.UK Chat (UK Government Digital Service)</h4>
+          <p>ใช้ Claude บน AWS Bedrock — 90% accuracy · 88% answer rate · block jailbreak 508/508 · ผู้ใช้ 73% บอกว่ามีประโยชน์ · 64% พอใจ</p>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-bar gold"></div>
+          <h4>Ireland MyWelfare</h4>
+          <p>Auto-approve illness benefit 83% · treatment benefit 98% — pattern หลักของ TrustFlow Auto-Clear</p>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-bar gold"></div>
+          <h4>Estonia e-Government</h4>
+          <p>99% บริการรัฐเป็นดิจิทัล — ประชาชนประหยัดเวลารวม 800 ปี/ปี · บริการรัฐระดับ digital-first</p>
+        </div>
+        <div class="card">
+          <div class="card-bar gold"></div>
+          <h4>Vanuatu e-Single Window (UNCTAD)</h4>
+          <p>Paperless trade — ลด 2 procedures = ลด CO₂ 5,827 กิโลกรัม · proof-point สำหรับ People-Planet Ledger</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-title">GLO TrustFlow AI</div>
+        <div class="footer-brand-sub">ระบบจัดการเคสอัจฉริยะของสำนักงานสลากกินแบ่งรัฐบาล</div>
+        <div class="footer-meta">
+          เอกสารฉบับนี้จัดทำขึ้นสำหรับการประกวด <strong style="color:white;">GLO Innovation Challenge 2026</strong> ภายใต้ Pillar "ระบบจัดการงานอัจฉริยะ (Process Automation)" — สอดคล้องกับมาตรฐาน C4 Model (Simon Brown), TOGAF 9.2 Architecture Content Framework และ ISO/IEC/IEEE 42010:2022
+        </div>
+      </div>
+      <div>
+        <h5>Companion Documents</h5>
+        <ul>
+          <li>TRF-ARCH-001 · Layered Architecture (Fig. 1)</li>
+          <li>TRF-ARCH-002 · System Context (Fig. 2)</li>
+          <li>TRF-SEQ-001 to 005 · Sequence Flows</li>
+          <li>TRF-MERMAID · Editable Mermaid Source</li>
+          <li>TRF-UI-001/002/003 · UI Mockups (forthcoming)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Document Control</h5>
+        <ul>
+          <li>Reference: TRF-DOC-001</li>
+          <li>Revision: v1.0</li>
+          <li>Issued: 24 พฤษภาคม 2569</li>
+          <li>Status: Draft for Review</li>
+          <li>Classification: Internal</li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">
+      <span>© สำนักงานสลากกินแบ่งรัฐบาล · 2569 BE</span>
+      <span>Solution Reference Document · Page 1 of 1</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ MERMAID INIT ============ -->
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    securityLevel: 'loose',
+    theme: 'base',
+    themeVariables: {
+      fontFamily: "'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif",
+      fontSize: '14px',
+      background: '#131F33',
+      primaryColor: '#1F2937',
+      primaryTextColor: '#F1F5F9',
+      primaryBorderColor: '#475569',
+      lineColor: '#94A3B8',
+      secondaryColor: '#13315C',
+      tertiaryColor: '#0F1E33',
+      actorBkg: '#1F2937',
+      actorBorder: '#475569',
+      actorTextColor: '#F1F5F9',
+      actorLineColor: '#94A3B8',
+      signalColor: '#CBD5E0',
+      signalTextColor: '#F1F5F9',
+      labelBoxBkgColor: '#13315C',
+      labelBoxBorderColor: '#475569',
+      labelTextColor: '#FFFFFF',
+      loopTextColor: '#F1F5F9',
+      noteBkgColor: '#374151',
+      noteTextColor: '#F1F5F9',
+      noteBorderColor: '#6B7280',
+      altBackground: '#1A2D45',
+      sequenceNumberColor: '#FFFFFF',
+      activationBkgColor: '#475569',
+      activationBorderColor: '#94A3B8'
+    },
+    sequence: {
+      diagramMarginX: 40,
+      diagramMarginY: 24,
+      actorMargin: 60,
+      width: 160,
+      height: 50,
+      boxMargin: 12,
+      boxTextMargin: 8,
+      noteMargin: 12,
+      messageMargin: 40,
+      mirrorActors: true,
+      bottomMarginAdj: 4,
+      useMaxWidth: true,
+      rightAngles: false,
+      showSequenceNumbers: false
+    }
+  });
+</script>
+
+</body>
+</html>
