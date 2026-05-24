@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: 252 251 248;
+    --color-navy: 11 37 69;
+    --color-gold: 184 134 11;
+    --color-maroon: 127 29 29;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-cream text-ink-600 font-thai antialiased;
+    font-feature-settings: "kern" 1, "liga" 1, "ss01" 1;
+  }
+
+  ::selection {
+    background: rgb(var(--color-gold) / 0.25);
+    color: rgb(var(--color-navy));
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--color-bg));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(11, 37, 69, 0.2);
+    border-radius: 5px;
+    border: 2px solid rgb(var(--color-bg));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(11, 37, 69, 0.4);
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1280px] px-6 sm:px-8 lg:px-10;
+  }
+
+  .container-wide {
+    @apply mx-auto w-full max-w-[1440px] px-6 sm:px-8 lg:px-10;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-gold-500;
+  }
+
+  .section-tag {
+    @apply inline-block rounded-sm border border-ink-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-tag;
+  }
+
+  .dark-section .section-tag {
+    @apply border-darkbg-200 bg-darkbg-100 text-gold-300;
+  }
+
+  /* Mermaid diagram in dark sections */
+  .mermaid-host svg {
+    @apply mx-auto !max-w-full;
+    background: transparent !important;
+  }
+
+  /* SVG figure embed - ensure crisp rendering and responsive */
+  .figure-svg-host {
+    @apply relative w-full overflow-hidden bg-white;
+  }
+  .figure-svg-host img,
+  .figure-svg-host object {
+    @apply block h-auto w-full;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Gold-accented underline */
+  .underline-gold {
+    background-image: linear-gradient(
+      transparent calc(100% - 4px),
+      rgb(var(--color-gold) / 0.4) 4px
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+
+  /* Diagonal pattern for ornamental dividers */
+  .pattern-diag {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(11, 37, 69, 0.04),
+      rgba(11, 37, 69, 0.04) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  }
+}
+
+/* Print styles - cleaner output when exported to PDF */
+@media print {
+  nav,
+  .no-print,
+  [data-no-print="true"] {
+    display: none !important;
+  }
+  section {
+    page-break-inside: avoid;
+    padding: 24px 0 !important;
+  }
+  body {
+    background: white !important;
+  }
+  .dark-section {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
